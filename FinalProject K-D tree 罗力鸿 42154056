@@ -1,0 +1,108 @@
+(2)
+implementation of insert:
+   def insert(self, p: List[Point]):
+        """insert a list of points"""
+        def insert_node(node, depth, point):
+            if node is None:
+                self.n += 1
+                return Node(location=point, left=None, right=None)
+            if depth % 2 == 0:
+              if point.x<node. location.x:
+                node. left = insert_node (node. left, depth + 1, point)
+              else:
+                node.right = insert_node(node.right, depth + 1, point)
+            else:
+             if point.y < node. location.y:
+                node.left = insert_node (node. left, depth + 1, point)
+             else:
+                node.right = insert_node (node.right, depth + 1, point)
+            return node
+
+        for point in p:
+                self._root = insert_node(self._root, 0, point)
+
+
+implementation of range:
+    def range(self, rectangle: Rectangle) -> List[Point]:
+        """range query"""
+        points = []
+        
+        def search_node (node, depth) :
+          if node is None:
+            return
+          if rectangle.is_contains (node. location):
+             points.append (node. location)
+          if depth % 2 == 0:
+             if rectangle. lower.x <= node. location.x: search_node (node. left, depth + 1)
+             if rectangle.upper.x >= node. location.x:
+                search_node (node.right, depth + 1)
+          else:
+             if rectangle.lower.y <= node. location.y: search_node (node. left, depth + 1)
+             if rectangle.upper y >= node. location.y:
+                 search_node (node.right, depth + 1) 
+                 
+    search_node(self._root, 0)
+    return points
+    
+
+    
+(4)
+visualize the time performance between the KD-tree method and naive method，here is the code:
+
+#createlistsofxandyvalues
+x_values = []
+y_values_kd = []
+y_values_naive = []
+for i in range(10, 1000, 50):
+    points= [Point(x,y)for x in range(i)for y in range(i)]
+    
+    lower = Point (500, 500)
+    upper= Point (504,504)
+    rectangle = Rectangle (lower, upper)
+    # naive method
+    start = int(round (time.time () * 1000))
+    result = [p for p in points if rectangle.is_contains(p)]
+    end = int(round(time. time () * 1000))|
+    y_values_naive.append(end - start)
+    kd = KDTree()
+    kd.insert (points)
+    # k-d tree
+    tart = int(round (time.time () * 1000))
+    result2 = kd.range (rectangle)
+    end=int(round(time.time()*1000))
+    y_values_kd.append(end - start)
+    x_values.append(i)
+# plot the graphs 
+plt.plot (x_values, y_values_kd, label='k-d tree') 
+plt.plot (x_values, y_values_naive, label='naive') 
+pit.xlabel( 'Number of points') 
+pit.ylabel('Execution time (ms)') 
+plt.legend ()
+plt.show()
+
+
+(5)
+Here is the code.
+from typing import Tuple
+class KDTree:
+
+  def nearest_neighbor (self, p: Point) -> Tuple [Point, float]:
+     """nearest neighbor query"""
+     def _nearest_neighbor (node, P, depth, min_dist, nearest) :
+       if not node:
+        return nearest, min_dist
+       axis = depth % 2
+       if p[axis] < node. location[axis]:
+          nearest, min_dist = _nearest_neighbor (node. left, p, depth + 1, min_dist, nearest)
+       if abs (p[axis] - node. location [axis]) < min_dist:
+          nearest, min_dist = _nearest_neighbor (node.right, p, depth + 1, min_dist, nearest)
+       else:
+          nearest, min_dist = _nearest_neighbor (node.right, p, depth + 1, min_dist, nearest)
+          if abs (p[axis] - node. location [axis]) < min_dist:
+           nearest, min_dist = _nearest_neighbor (node. left, p, depth + 1, min_dist, nearest)
+     return nearest, min_dist
+
+  def dist (p1, p2):
+    return (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 
+    nearest, _nearest_neighbor(self._root, p, 0, float('inf'), None)
+    return nearest, dist (nearest, p)
